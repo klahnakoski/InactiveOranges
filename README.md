@@ -1,7 +1,8 @@
-Contributor Dashboard
-=====================
+Inactive Oranges Dashboard
+==========================
 
-This is a small dashboard which will help our team, [the A*Team](https://wiki.mozilla.org/Auto-tools),
-stay responsive to contributors.
+A dashboard that cross-references Orange Factor with Bugzilla to create 
+a list of the top intermittent failures with no bug comments in the past 
+week.
 
-You can see the [code served live from Kyle's people page](http://people.mozilla.org/~klahnakoski/contributors/dashboard.html#).
+This is a static site, and is [served from Kyle's people page](https://people.mozilla.org/~klahnakoski/InactiveOranges/index.html).
