@@ -47,11 +47,11 @@ Sprints = [
 				]}},
 				{"name" : "Targeted", "esfilter" : {"and" : [
 					{"term" : {"target_milestone" : targets}},
-//				{"not": {"term": {"cf_blocking_loop": blocks}}}  // UNFORTUNATE REDUNDANCY
+//        {"not": {"term": {"cf_blocking_loop": blocks}}}  // UNFORTUNATE REDUNDANCY
 				]}}
 			]
 		};
-	}).appendArray([
+	}).extend([
 		"2.1 S1 (1aug)  7/28-8/1",
 		"2.1 S2 (15aug)  8/2-8/15",
 		"2.1 S3 (29aug)  8/16-8/29",
@@ -85,7 +85,7 @@ Sprints = [
 					]}},
 					{"name" : "Targeted", "esfilter" : {"and" : [
 						{"term" : {"target_milestone" : targets}},
-//				{"not": {"term": {"cf_blocking_b2g": blocks}}}  // UNFORTUNATE REDUNDANCY
+//        {"not": {"term": {"cf_blocking_b2g": blocks}}}  // UNFORTUNATE REDUNDANCY
 					]}}
 				]
 			};
@@ -417,7 +417,7 @@ Dimension.addEdges(true, Mozilla, [
 			]
 		}
 
-	].appendArray(Sprints).sort(function(a, b){
+	].extend(Sprints).sort(function(a, b){
 			if (Date.newInstance(a.targetDate) > Date.newInstance(b.targetDate)) return 1;
 			if (Date.newInstance(a.targetDate) < Date.newInstance(b.targetDate)) return -1;
 			if (Date.newInstance(a.start_date) > Date.newInstance(b.start_date)) return -1;

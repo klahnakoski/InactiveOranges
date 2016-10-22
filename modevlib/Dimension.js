@@ -15,6 +15,33 @@ var DEFAULT_QUERY_LIMIT = 20;
 (function () {
 
 	Dimension.prototype = {
+
+		"getActiveDataDomain": function(){
+			var output = {
+				"type": this.type,
+				"name": this.name,
+				"min": this.min,
+				"max": this.max,
+				"interval": this.interval,
+				"value": (!this.value && this.partitions) ? "name" : this.value
+			};
+
+			if (this.partitions) {
+				output.partitions = this.partitions.map(function(v, i){
+					if (i >= coalesce(self.limit, DEFAULT_QUERY_LIMIT)) return undefined;
+					v.style = coalesce(v.style, {});
+					var output = clonePart(v);
+					output.where = coalesce(v.esfilter, v.where);
+					output.esfilter = undefined;
+					output.fullFilter = undefined;
+					return output;
+				})
+			}//endif
+
+			return output;
+		},
+
+
 		"getDomain": function (param){
 			//param.fullFilter  SET TO true TO HAVE FULL FILTER IN PARTITIONS
 			//param.depth IS MEANT TO REACH INTO SUB-PARTITIONS
@@ -100,7 +127,7 @@ var DEFAULT_QUERY_LIMIT = 20;
 					"end": coalesce(this.end, (this.type == "set" && this.name !== undefined) ? function(v){
 						return v;
 					} : undefined),  //I DO NOT KNOW WHY IS NOT return v.name
-					//			"value":(!this.value && this.partitions) ? "name" : this.value,
+					//      "value":(!this.value && this.partitions) ? "name" : this.value,
 					"isFacet": this.isFacet
 				};
 			} else {
@@ -132,9 +159,8 @@ var DEFAULT_QUERY_LIMIT = 20;
 	};
 
 
-
 	function clonePart(v){
-    	var parent = v.parent;
+		var parent = v.parent;
 		var index = v.index;
 		v.parent = undefined;
 		v.index = undefined;
@@ -164,8 +190,8 @@ var DEFAULT_QUERY_LIMIT = 20;
 			} //endif
 		}//for
 		parentPart.partitions.push(c);
-//		parentPart[c.name]=c;  //HANDLED BY convertPart()
-//		c.parent=parentPart;    //HANDLED BY convertPart()
+//    parentPart[c.name]=c;  //HANDLED BY convertPart()
+//    c.parent=parentPart;    //HANDLED BY convertPart()
 		addParts(c, childPath, count, index + 1);
 	}//method
 
@@ -189,11 +215,11 @@ var DEFAULT_QUERY_LIMIT = 20;
 				if (part.parent && part.parent.esfilter !== undefined && part.parent.esfilter.match_all === undefined) {
 					part.esfilter = {"and": [part.parent.esfilter, part.esfilter]}
 				}//endif
-//				TOO EXPENSIVE FOR ES TO CALCULATE, NEED AN EQUATION SIMPLIFIER
+//        TOO EXPENSIVE FOR ES TO CALCULATE, NEED AN EQUATION SIMPLIFIER
 				part.fullFilter = {"and": [part.esfilter]};
 				if (siblingFilters !== undefined) {
-					part.fullFilter["and"].appendArray(siblingFilters.map(function (f) {
-						return {"not": f}
+					part.fullFilter["and"].extend(siblingFilters.map(function (f) {
+						return {"not": f};
 					}))
 				}//endif
 				if (lowerCaseOnly) part.esfilter = convert.json2value(convert.value2json(part.esfilter).toLowerCase());
@@ -228,7 +254,7 @@ var DEFAULT_QUERY_LIMIT = 20;
 
 			if (dim.limit === undefined) dim.limit = DEFAULT_QUERY_LIMIT;
 
-			if (dim.field !== undefined && Qb.domain.PARTITION.contains(dim.type) && dim.partitions === undefined) {
+			if (dim.field !== undefined && qb.domain.PARTITION.contains(dim.type) && dim.partitions === undefined) {
 				dim.field = Array.newInstance(dim.field);
 
 				dim.partitions = Thread.run(function*() {
@@ -350,7 +376,7 @@ var DEFAULT_QUERY_LIMIT = 20;
 			}//endif
 
 
-//			dim.isFacet=true;		//FORCE TO BE A FACET IN ES QUERIES
+//      dim.isFacet=true;    //FORCE TO BE A FACET IN ES QUERIES
 			if (dim.type === undefined) dim.type = "set";
 
 			//ADD CONVENIENCE METHODS

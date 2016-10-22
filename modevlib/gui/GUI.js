@@ -78,7 +78,7 @@ GUI = {};
 			parameters,    //LIST OF PARAMETERS (see GUI.AddParameters FOR DETAILS)
 			relations,     //SOME RULES TO APPLY TO PARAMETERS, IN CASE THE HUMAN MAKES SMALL MISTAKES
 			indexName,     //PERFORM CHECKS ON THIS INDEX
-			showDefaultFilters,  //SHOW THE Product/Compoentn/Team FILTERS
+			showDefaultFilters,  //SHOW THE Product/Component/Team FILTERS
 			performChecks,       //PERFORM SOME CONSISTENCY CHECKS TOO
 			checkLastUpdated     //SEND QUERY TO GET THE LAST DATA?
 		) {
@@ -109,15 +109,15 @@ GUI = {};
 			function post_filter_functions(){
 				GUI.showLastUpdated(indexName);
 				GUI.AddParameters(parameters, relations); //ADD PARAM AND SET DEFAULTS
-				GUI.Parameter2State();			//UPDATE STATE OBJECT WITH THOSE DEFAULTS
+				GUI.Parameter2State();      //UPDATE STATE OBJECT WITH THOSE DEFAULTS
 
 				GUI.makeSelectionPanel();
 
 				GUI.relations = coalesce(relations, []);
 				GUI.FixState();
 
-				GUI.URL2State();				//OVERWRITE WITH URL PARAM
-				GUI.State2URL.isEnabled = true;	//DO NOT ALLOW URL TO UPDATE UNTIL WE HAVE GRABBED IT
+				GUI.URL2State();        //OVERWRITE WITH URL PARAM
+				GUI.State2URL.isEnabled = true;  //DO NOT ALLOW URL TO UPDATE UNTIL WE HAVE GRABBED IT
 
 				GUI.FixState();
 				GUI.State2URL();
@@ -170,14 +170,14 @@ GUI = {};
 					tm.html(new Template("<div style={{style|style}}>{{name}}</div>").expand(result.index));
 					tm.append("<br>ES Last Updated " + time.addTimezone().format("NNN dd @ HH:mm") + Date.getTimezone());
 				} else if (indexName == "reviews") {
-                    var result = yield (ESQuery.run({
-                        "from": "reviews",
-                        "select": [
-                            {"name": "last_request", "value": "request_time", "aggregate": "maximum"}
-                        ]
-                    }));
-                    time = Date.newInstance(result.cube.last_request);
-                    $("#testMessage").html("Reviews Last Updated " + time.addTimezone().format("NNN dd @ HH:mm") + Date.getTimezone());
+										var result = yield (ESQuery.run({
+												"from": "reviews",
+												"select": [
+														{"name": "last_request", "value": "request_time", "aggregate": "maximum"}
+												]
+										}));
+										time = Date.newInstance(result.cube.last_request);
+										$("#testMessage").html("Reviews Last Updated " + time.addTimezone().format("NNN dd @ HH:mm") + Date.getTimezone());
 				} else if (indexName == "bug_tags") {
 					esHasErrorInIndex = false;
 					time = yield (BUG_TAGS.getLastUpdated());
@@ -300,7 +300,6 @@ GUI = {};
 
 		GUI.State2URL.isEnabled = false;
 
-
 		GUI.URL2State = function () {
 			var urlState = Session.URL.getFragment();
 			Map.forall(urlState, function (k, v) {
@@ -310,8 +309,8 @@ GUI = {};
 					if (v.id == k) return v;
 				})[0];
 
-				if (p && Qb.domain.ALGEBRAIC.contains(p.type)) {
-					v = v.escape(Map.inverse(GUI.urlMap));
+				if (p && qb.domain.ALGEBRAIC.contains(p.type)) {
+					//v = v.escape(Map.inverse(GUI.urlMap));
 					GUI.state[k] = v;
 				} else if (p && p.type == "json") {
 					try {
@@ -330,7 +329,7 @@ GUI = {};
 					if (v.trim()==""){
 						GUI.state[k]=[];
 					}else{
-						GUI.state[k] = v.split(",").map(String.trim);
+						GUI.state[k] = v.split(",").map(String.trim).unwrap();
 					}//endif
 				} else if (p && p.type == "code") {
 					v = v.escape(Map.inverse(GUI.urlMap));
@@ -338,12 +337,10 @@ GUI = {};
 				} else if (GUI.state[k].isFilter) {
 					GUI.state[k].setSimpleState(v);
 				} else {
-					GUI.state[k] = v.split(",");
+					GUI.state[k] = v.split(",").unwrap();
 				}//endif
 			});
 		};
-
-
 
 		///////////////////////////////////////////////////////////////////////////
 		// ADD INTERACTIVE PARAMETERS TO THE PAGE
@@ -355,7 +352,7 @@ GUI = {};
 		///////////////////////////////////////////////////////////////////////////
 		GUI.AddParameters = function (parameters, relations) {
 			//KEEP SIMPLE PARAMETERS GUI.parameters AND REST IN customFilters
-			GUI.parameters = parameters.map(function (param) {
+			GUI.parameters = parameters.mapExists(function (param) {
 				if (param.type.isFilter) {
 					GUI.state[param.id] = param.type;
 					if (param.name) param.type.name = param.name;
@@ -427,7 +424,7 @@ GUI = {};
 							GUI.refreshChart();
 						}
 					});
-					defaultValue = defaultValue.format("yyyy-MM-dd");
+					defaultValue = Date.newInstance(defaultValue).format("yyyy-MM-dd");
 					$("#" + param.id).val(defaultValue);
 					////////////////////////////////////////////////////////////////////////
 					// DURATION
@@ -466,7 +463,7 @@ GUI = {};
 						if (this.isChanging) return;
 						this.isChanging = true;
 						try {
-							codeDiv = $("#" + param.id);	//JUST TO BE SURE WE GOT THE RIGHT ONE
+							codeDiv = $("#" + param.id);  //JUST TO BE SURE WE GOT THE RIGHT ONE
 							//USE JSONLINT TO FORMAT AND TEST-COMPILE THE code
 							var code = jsl.format.formatJson(codeDiv.val());
 							codeDiv.val(code);
@@ -518,7 +515,6 @@ GUI = {};
 		//RETURN TRUE IF ANY CHANGES HAVE BEEN MADE
 		GUI.State2Parameter = function () {
 			GUI.parameters.forEach(function (param) {
-
 				if (param.type == "json") {
 					$("#" + param.id).val(convert.value2json(GUI.state[param.id]));
 				} else if (param.type == "boolean") {
@@ -526,14 +522,13 @@ GUI = {};
 				} else if (param.type == "datetime") {
 					$("#" + param.id).val(Date.newInstance(GUI.state[param.id]).format("yyyy-MM-dd HH:mm:ss"))
 				} else if (param.type == "set") {
-					$("#" + param.id).val(GUI.state[param.id].join(","))
+					$("#" + param.id).val(Array.newInstance(GUI.state[param.id]).join(","))
 				} else {
 				//if (param.type.getSimpleState) return;  //param.type===GUI.state[param.id] NO ACTION REQUIRED
 					$("#" + param.id).val(GUI.state[param.id]);
 				}//endif
 			});
 		};
-
 
 		//RETURN TRUE IF ANY CHANGES HAVE BEEN MADE
 		GUI.Parameter2State = function () {
@@ -636,7 +631,7 @@ GUI = {};
 			$("#summary").html(html);
 		};
 
-		GUI.refreshInProgress = false;	//TRY TO AGGREGATE MULTIPLE refresh() REQUESTS INTO ONE
+		GUI.refreshInProgress = false;  //TRY TO AGGREGATE MULTIPLE refresh() REQUESTS INTO ONE
 
 		GUI.refresh = function (refresh) {
 			if (GUI.refreshInProgress) return;

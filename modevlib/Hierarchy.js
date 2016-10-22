@@ -53,7 +53,7 @@ Hierarchy.fromList = function(args){
 	deleteMe.forall(function(pair){
 		childList[pair[0]] = childList[pair[0]].filter({"not" : {"term" : {"id" : pair[1].id}}});
 	});
-	roots.appendArray(deleteMe.select("1"));
+	roots.extend(deleteMe.select("1"));
 
 
 	var heir = function(children){
@@ -175,15 +175,15 @@ Hierarchy.topologicalSort = function(args){
 	var graph = args.from;
 	var id_field = args.id_field;
 	var children_field = args.children_id_field;
-//	var children_field="_EDGES";
+//  var children_field="_EDGES";
 
 	//ADD EDGES SO FOLLOWING ALGORITHM WORKS
-//	Map.forall(graph, function(k, v){
-//		v[children_field]=[];
-//		v[children_id_field].forall(function(v, i){
-//			v[children_field].push(graph[v]);
-//		});
-//	});
+//  Map.forall(graph, function(k, v){
+//    v[children_field]=[];
+//    v[children_id_field].forall(function(v, i){
+//      v[children_field].push(graph[v]);
+//    });
+//  });
 
 
 	var numberOfNodes = Object.keys(graph).length;
@@ -212,7 +212,7 @@ Hierarchy.topologicalSort = function(args){
 						if (graph[v].__parent !== undefined) return v;
 					});
 					if (hasParent.length == 0) Log.error("Isolated cycle found");
-					queue.appendArray(hasParent);
+					queue.extend(hasParent);
 				}//endif
 			}//END OF HACK
 
@@ -227,7 +227,7 @@ Hierarchy.topologicalSort = function(args){
 		}
 		graph[nodeId][children_field].forall(function(child){
 			graph[child].indegrees--;
-			graph[child].__parent = graph[nodeId];		//MARKUP FOR HACK
+			graph[child].__parent = graph[nodeId];    //MARKUP FOR HACK
 		});
 		processed.push(graph[nodeId]);
 	}
@@ -239,16 +239,16 @@ Hierarchy.topologicalSort = function(args){
 			if (node.indegrees === undefined) node.indegrees = 0;
 			if (node[children_field] === undefined) node[children_field] = [];
 
-//			if (nodeId=="836963"){
-//				Log.note("");
-//			}//endif
+//      if (nodeId=="836963"){
+//        Log.note("");
+//      }//endif
 
 			node[children_field].forall(function(e){
 				if (graph[e] === undefined) {
 					graph[e] = Map.newInstance(id_field, e);
 				}//endif
 
-//				if (nodeId==831910 && e==831532) return;	//REMOVE CYCLE (CAN'T HANDLE CYCLES)
+//        if (nodeId==831910 && e==831532) return;  //REMOVE CYCLE (CAN'T HANDLE CYCLES)
 
 				if (graph[e].indegrees === undefined) {
 					graph[e].indegrees = 1
@@ -385,7 +385,7 @@ function* getDailyDependencies(data, topBugFilter){
 			"id_field" : "bug_id",
 			"fk_field" : "dependson",
 			"descendants_field" : "dependencies"
-		});	//yield (Thread.YIELD);
+		});  //yield (Thread.YIELD);
 
 		var allDescendantsForToday = Array.union(allTopBugs.select("dependencies")).union(allTopBugs.select("bug_id")).map(function(v){
 			return v - 0;
@@ -413,7 +413,7 @@ function* getDailyDependencies(data, topBugFilter){
 			"id_field" : "bug_id",
 			"fk_field" : "dependson",
 			"descendants_field" : "dependencies"
-		});	//yield (Thread.YIELD);
+		});  //yield (Thread.YIELD);
 
 		var openDescendantsForToday = Array.union(openTopBugs.select("dependencies")).union(openTopBugs.select("bug_id")).map(function(v){
 			return v - 0;

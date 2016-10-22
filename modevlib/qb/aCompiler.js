@@ -13,7 +13,7 @@ aCompile.method_usingObjects=function(code, contextObjects){
 
 	var contextTypes=[];
 	contextObjects.forall(function(v, i){
-		contextTypes[i]={"columns":Qb.getColumnsFromList([v])};
+		contextTypes[i]={"columns":qb.getColumnsFromList([v])};
 	});
 
 	return aCompile.method(code, contextTypes);
@@ -50,7 +50,7 @@ aCompile.method=function(code, contextTypes){
 		//FIRST CONTEXT OBJECT IS SPECIAL, AND WILL HAVE IT'S VARS ASSIGNED BACK
 		contextTypes[0].columns.forall(function(p){
 			if (code.indexOf(p.name) != -1){
-				f += contexTypeNames[0] + "." + p.name + "=" + p.name + ";	\n";
+				f += contexTypeNames[0] + "." + p.name + "=" + p.name + ";  \n";
 			}//endif
 		});
 
