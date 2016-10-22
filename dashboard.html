@@ -1,0 +1,405 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+<HTML>
+
+<HEAD>
+	<script type="text/javascript" src="modevlib/imports/import.js"></script>
+	<script type="text/javascript" src="js/chart.js"></script>
+</HEAD>
+<BODY>
+
+
+<table>
+	<tr>
+		<td>
+			<div id="sidebar" style="width:340px;min-height:400px;">
+				<div id="parameters" class="parameters">
+				</div>
+				<div id="filters" class="menu"></div>
+
+				<select id="product" multiple="multiple" size="9">
+					<option value="Add-on SDK">Add-on SDK
+					</option>
+					<option value="addons.mozilla.org">addons.mozilla.org
+					</option>
+					<option value="addons.mozilla.org Graveyard">addons.mozilla.org Graveyard
+					</option>
+					<option value="Air Mozilla">Air Mozilla
+					</option>
+					<option value="Android Background Services">Android Background Services
+					</option>
+					<option value="AUS">AUS
+					</option>
+					<option value="B2GDroid">B2GDroid
+					</option>
+					<option value="Boot2Gecko Graveyard">Boot2Gecko Graveyard
+					</option>
+					<option value="Bugzilla">Bugzilla
+					</option>
+					<option value="bugzilla.mozilla.org">bugzilla.mozilla.org
+					</option>
+					<option value="Calendar">Calendar
+					</option>
+					<option value="Camino Graveyard">Camino Graveyard
+					</option>
+					<option value="CCK">CCK
+					</option>
+					<option value="Chat Core">Chat Core
+					</option>
+					<option value="Cloud Services">Cloud Services
+					</option>
+					<option value="Community Building">Community Building
+					</option>
+					<option value="Composer">Composer
+					</option>
+					<option value="Content Services">Content Services
+					</option>
+					<option value="Core">Core
+					</option>
+					<option value="Core Graveyard">Core Graveyard
+					</option>
+					<option value="Data &amp; BI Services Team">Data &amp; BI Services Team
+					</option>
+					<option value="Data &amp; BI Services Team Graveyard">Data &amp; BI Services Team Graveyard
+					</option>
+					<option value="Data Compliance">Data Compliance
+					</option>
+					<option value="Datazilla">Datazilla
+					</option>
+					<option value="Derivatives">Derivatives
+					</option>
+					<option value="Developer Documentation">Developer Documentation
+					</option>
+					<option value="Developer Ecosystem">Developer Ecosystem
+					</option>
+					<option value="Developer Engagement">Developer Engagement
+					</option>
+					<option value="Developer Services">Developer Services
+					</option>
+					<option value="Directory">Directory
+					</option>
+					<option value="Documentation">Documentation
+					</option>
+					<option value="Enterprise Information Security">Enterprise Information Security
+					</option>
+					<option value="Extend Firefox">Extend Firefox
+					</option>
+					<option value="Fennec Graveyard">Fennec Graveyard
+					</option>
+					<option value="Firefox">Firefox
+					</option>
+					<option value="Firefox Affiliates Graveyard">Firefox Affiliates Graveyard
+					</option>
+					<option value="Firefox for Android">Firefox for Android
+					</option>
+					<option value="Firefox for iOS">Firefox for iOS
+					</option>
+					<option value="Firefox for Metro">Firefox for Metro
+					</option>
+					<option value="Firefox Friends">Firefox Friends
+					</option>
+					<option value="Firefox Graveyard">Firefox Graveyard
+					</option>
+					<option value="Firefox Health Report">Firefox Health Report
+					</option>
+					<option value="Firefox OS">Firefox OS
+					</option>
+					<option value="Focus">Focus
+					</option>
+					<option value="FSA">FSA
+					</option>
+					<option value="Grendel">Grendel
+					</option>
+					<option value="Hello (Loop)">Hello (Loop)
+					</option>
+					<option value="Infrastructure &amp; Operations">Infrastructure &amp; Operations
+					</option>
+					<option value="Infrastructure &amp; Operations Graveyard">Infrastructure &amp; Operations Graveyard
+					</option>
+					<option value="Input">Input
+					</option>
+					<option value="Instantbird">Instantbird
+					</option>
+					<option value="Instantbird Servers">Instantbird Servers
+					</option>
+					<option value="Intellego">Intellego
+					</option>
+					<option value="Internet Public Policy">Internet Public Policy
+					</option>
+					<option value="Invalid Bugs">Invalid Bugs
+					</option>
+					<option value="JSS">JSS
+					</option>
+					<option value="L20n">L20n
+					</option>
+					<option value="Localization Infrastructure and Tools">Localization Infrastructure and Tools
+					</option>
+					<option value="MailNews Core">MailNews Core
+					</option>
+					<option value="MailNews Core Graveyard">MailNews Core Graveyard
+					</option>
+					<option value="Marketing">Marketing
+					</option>
+					<option value="Marketplace">Marketplace
+					</option>
+					<option value="Minimo">Minimo
+					</option>
+					<option value="Mozilla Developer Network">Mozilla Developer Network
+					</option>
+					<option value="Mozilla Foundation">Mozilla Foundation
+					</option>
+					<option value="Mozilla Foundation Communications">Mozilla Foundation Communications
+					</option>
+					<option value="Mozilla Grants">Mozilla Grants
+					</option>
+					<option value="Mozilla Labs">Mozilla Labs
+					</option>
+					<option value="Mozilla Labs Graveyard">Mozilla Labs Graveyard
+					</option>
+					<option value="Mozilla Localizations">Mozilla Localizations
+					</option>
+					<option value="Mozilla Localizations Graveyard">Mozilla Localizations Graveyard
+					</option>
+					<option value="Mozilla Messaging">Mozilla Messaging
+					</option>
+					<option value="Mozilla Metrics">Mozilla Metrics
+					</option>
+					<option value="Mozilla QA">Mozilla QA
+					</option>
+					<option value="Mozilla QA Graveyard">Mozilla QA Graveyard
+					</option>
+					<option value="Mozilla Reps">Mozilla Reps
+					</option>
+					<option value="mozilla.org">mozilla.org
+					</option>
+					<option value="mozilla.org Graveyard">mozilla.org Graveyard
+					</option>
+					<option value="MozillaClassic">MozillaClassic
+					</option>
+					<option value="mozillaignite">mozillaignite
+					</option>
+					<option value="NSPR">NSPR
+					</option>
+					<option value="NSS">NSS
+					</option>
+					<option value="Other Applications">Other Applications
+					</option>
+					<option value="Other Applications Graveyard">Other Applications Graveyard
+					</option>
+					<option value="Pancake">Pancake
+					</option>
+					<option value="Participation Infrastructure">Participation Infrastructure
+					</option>
+					<option value="Penelope">Penelope
+					</option>
+					<option value="Petri">Petri
+					</option>
+					<option value="Plugin Check">Plugin Check
+					</option>
+					<option value="Plugins">Plugins
+					</option>
+					<option value="Powertool">Powertool
+					</option>
+					<option value="Privacy">Privacy
+					</option>
+					<option value="quality.mozilla.org">quality.mozilla.org
+					</option>
+					<option value="Release Engineering">Release Engineering
+					</option>
+					<option value="Rhino">Rhino
+					</option>
+					<option value="SeaMonkey">SeaMonkey
+					</option>
+					<option value="Servo">Servo
+					</option>
+					<option value="Skywriter">Skywriter
+					</option>
+					<option value="Snippets">Snippets
+					</option>
+					<option value="Socorro">Socorro
+					</option>
+					<option value="support.mozilla.org">support.mozilla.org
+					</option>
+					<option value="support.mozilla.org Graveyard">support.mozilla.org Graveyard
+					</option>
+					<option value="support.mozillamessaging.com Graveyard">support.mozillamessaging.com Graveyard
+					</option>
+					<option value="Tamarin">Tamarin
+					</option>
+					<option value="Taskcluster">Taskcluster
+					</option>
+					<option value="Tech Evangelism">Tech Evangelism
+					</option>
+					<option value="Tech Evangelism Graveyard">Tech Evangelism Graveyard
+					</option>
+					<option value="Testing">Testing
+					</option>
+					<option value="Testing Graveyard">Testing Graveyard
+					</option>
+					<option value="Testopia">Testopia
+					</option>
+					<option value="Thunderbird">Thunderbird
+					</option>
+					<option value="Toolkit">Toolkit
+					</option>
+					<option value="Toolkit Graveyard">Toolkit Graveyard
+					</option>
+					<option value="Tracking">Tracking
+					</option>
+					<option value="Tree Management">Tree Management
+					</option>
+					<option value="Tree Management Graveyard">Tree Management Graveyard
+					</option>
+					<option value="Untriaged Bugs">Untriaged Bugs
+					</option>
+					<option value="Web Apps">Web Apps
+					</option>
+					<option value="Webmaker">Webmaker
+					</option>
+					<option value="Websites">Websites
+					</option>
+					<option value="Websites Graveyard">Websites Graveyard
+					</option>
+					<option value="Webtools">Webtools
+					</option>
+					<option value="Webtools Graveyard">Webtools Graveyard
+					</option>
+					<option value="www.mozilla.org">www.mozilla.org
+					</option>
+				</select>
+
+
+			</div>
+
+		</td>
+		<td>
+			<div style="padding: 0 0 0 30px">
+				<h2 id="header">Contributor Status Dashboard</h2>
+				<table style="width:100%">
+					<tr>
+						<td><h3>Patches w.o. Review</h3>Patches without a review request, or missing reviewer.</td>
+					</tr>
+					<tr>
+						<td id="patches"></td>
+					</tr>
+					<tr>
+						<td>
+							<hr>
+						</td>
+					</tr>
+					<tr>
+						<td><h3>Review Requested</h3>Review has been requested, but it has not been completed yet. (Also catches
+							"feedback?")
+						</td>
+					</tr>
+					<tr>
+						<td id="pendingReview"></td>
+					</tr>
+					<tr>
+						<td>
+							<hr>
+						</td>
+					</tr>
+					<tr>
+						<td><h3>Review Minus</h3>Looks like patch has been rejected.</td>
+					</tr>
+					<tr>
+						<td id="reviewMinus"></td>
+					</tr>
+					<tr>
+						<td>
+							<hr>
+						</td>
+					</tr>
+					<tr>
+						<td><h3>Review Complete</h3>Looks like patch has been accepted, but bug is still not closed.</td>
+					</tr>
+					<tr>
+						<td id="completeReview"></td>
+					</tr>
+					<tr>
+						<td>
+							<hr>
+						</td>
+					</tr>
+					<tr>
+						<td><h3>Open Question</h3> bugs with <code>needinfo?</code> or bugs with question mark in last comment.</td>
+					</tr>
+					<tr>
+						<!--no response from mentor - either question in comment, or needinfo-->
+						<!--no response from assignee - after question in comment-->
+						<!--no response from assignee (even after need info)-->
+						<!--bugs that had a pending patch/question with no activity in >1 week (could  this be a dashboard)-->
+						<td id="openQuestion"></td>
+					</tr>
+					<tr>
+						<td>
+							<hr>
+						</td>
+					</tr>
+					<tr>
+						<td><h3>New Bugs</h3> Fresh Good First Bugs</td>
+					</tr>
+					<tr>
+						<td id="newBugs"></td>
+					</tr>
+					<tr>
+						<td>
+							<hr>
+						</td>
+					</tr>
+					<tr>
+						<td><h3>Stale Bugs</h3> bugs are assigned, but no activity for a week.</td>
+					</tr>
+					<tr>
+						<td id="staleBugs"></td>
+					</tr>
+					<tr>
+						<td>
+							<hr>
+						</td>
+					</tr>
+					<tr>
+						<td><h3>No Bites</h3> bug has been Good First Bug for over 3 months without activity, maybe it is not a good
+							first bug.
+						</td>
+					</tr>
+					<tr>
+						<td id="noBites"></td>
+					</tr>
+					<tr>
+						<td>
+							<hr>
+						</td>
+					</tr>
+
+					<!--TODO-->
+					<!--stopped after review- - patch was submitted and review-minused, then assignee lost interest-->
+					<!--healthy - has none of the above problems-->
+					<!--assigned bugs with no activity in 10 days be flagged-->
+					<!--review newly filed bugs to verify they are accurate (project page, mentored, etc.) - ignore ones that are assigned
+					activity on a bug with no response in 1 weeks is unacceptable, ideally 3 days (but how do we exclude holidays/weekends/etc.) ?
+					find all bugs with comments/etc. in the last 'X' days where one of the assigned mentors is not the last one to take action?
+					-->
+					<!--* new bugs since last check
+					we really should review these to ensure they have links to code, documentation, a mentor, and have something actionable, thoughts?
+					--->
+					<tr style="max-height:800px;overflow-y: scroll;">
+						<td id="open"></td>
+					</tr>
+				</table>
+			</div>
+
+		</td>
+	</tr>
+</table>
+
+
+<div class="footer">Source code: <a href="https://github.com/klahnakoski/Contributors/blob/master/dashboard.html">https://github.com/klahnakoski/Contributors/blob/master/dashboard.html</a>
+</div>
+<!--<div style="float:left;position: relative;" id="open"></div>-->
+
+</BODY>
+</HTML>
