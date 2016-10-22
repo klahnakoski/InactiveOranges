@@ -1,0 +1,186 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+<HTML>
+<HEAD>
+	<script type="text/javascript" src="modevlib/imports/import.js"></script>
+</HEAD>
+<BODY>
+
+<div id="sidebar" style="width:300px;">
+	<br>
+	<br>
+
+	<div style="height: 30px; text-align: center;vertical-align:middle;">
+		<span id="status" style="height:30px">Page Loading...</span><span class="loading"><img src="images/spinner.gif" alt=""></span>
+	</div>
+
+	<hr>
+	<div id="description">
+		Cross-reference Bugzilla and Orange Factor
+	</div>
+	<hr>
+	<div id="testMessage"></div>
+	<hr>
+	<div id="stats"></div>
+	<hr>
+	<div id="parameters" class="parameters">
+	</div>
+	<div id="filters" class="menu"></div>
+</div>
+
+<div style="align:left;position:relative;float:left;width:800px;">
+	<h1 id="title">Inactive Oranges</h1>
+	<h3>Most active intermittent failures with no comments for a week</h3>
+	<div id="content" style="width:800px;"></div>
+</div>
+
+
+<script type="application/javascript">
+
+importScript(
+	[
+		"js/review.js",
+		'modevlib/main.js'
+	], function(){
+		var KNOWN_ROBOTS=[
+			"pulsebot@bots.tld",
+			"orangefactor@bots.tld",
+			"intermittent-bug-filer@mozilla.bugs"
+		];
+
+		var thread;
+		var createChart = function(){
+			if (thread !== undefined)
+				thread.kill();
+			thread = Thread.run(__createChart());
+		};
+
+		var __createChart = function*(){
+
+			var oranges=null;
+			// GET THE FREQUENT ORANGES
+			var a = Log.action("get oranges", true);
+			try {
+				var response = yield Rest.post({
+					"url": "https://activedata.allizom.org/query",
+					"json": {
+						"from": "orange_factor",
+						"select":{"name":"OrangeCount", "value":"bug", "aggregate":"count"},
+						"groupby": ["bug"],
+						"where": {"gt": {"timestamp": {"date": "today-week"}}},
+						"limit": 100,
+						"format": "list"
+					}
+				});
+
+				oranges = Map.zip(response.data.map(function(b, i){
+					b.ordering = i;
+					b.comments=[];
+					return [b.bug, b]
+				}));
+
+			}finally{
+				Log.actionDone(a)
+			}//try
+
+
+			var bugs=null;
+			var comments=null;
+			var getBugs = Thread.run(function*(){
+				var ba = Log.action("get bugs", true);
+				try{
+					response = yield ESQuery.run({
+						"from": "public_bugs",
+						"select": ["bug_id", {"name":"Description", "value":"short_desc"}, "modified_ts"],
+						"esfilter": {"and": [
+							{"range":{"expires_on":{"gt":Date.now().getMilli()}}},
+							{"terms": {"bug_id": Map.keys(oranges)}}
+						]}
+					});
+
+					response.list.forall(function(b){
+						Map.setDefault(oranges[b.bug_id], b);
+					});
+				}finally{
+					Log.actionDone(ba)
+				}//try
+			});
+
+			var getComments= Thread.run(function*(){
+				var ca = Log.action("get comments", true);
+				try{
+					response = yield ESQuery.run({
+						"from": "public_comments",
+						"select": ["bug_id","modified_by", "modified_ts"],
+						"esfilter": {"and": [
+							{"not": {"terms": {"modified_by": KNOWN_ROBOTS}}},
+							{"range":{"modified_ts":{"gt":Date.newInstance("today-week").getMilli()}}},
+							{"terms": {"bug_id": Map.keys(oranges)}}
+						]}
+					});
+					response.list.forall(function(c){
+						oranges[c.bug_id].comments.append(c);
+					});
+
+				}finally{
+					Log.actionDone(ca)
+				}//try
+			});
+
+			yield Thread.join(getBugs);
+			yield Thread.join(getComments);
+
+			var output = Map.map(oranges, function(k,v){
+				if (v.comments.length==0){
+					return v;
+				}//endif
+			});
+
+
+			output=qb.sort(output, {"value":"OrangeCount", "sort":-1});
+			var html = new Template([
+				'<table class="table"><thead><tr>',
+				'<td>Bug ID</td>',
+				'<td>Description</td>',
+				'<td>Orange Count</td>',
+				'</tr></thead><tbody>',
+				{
+					"from":".",
+					"template":[
+						'<tr class="hoverable" onclick="Bugzilla.showBugs([{{bug}}])">',
+						'<td>{{bug}}</td>',
+						'<td style="width:600px;text-wrap: normal;">{{Description}}</td>',
+						'<td style="text-align: right">{{OrangeCount}}</td>',
+						'</tr>'
+					]
+				},
+				'</tbody></table>'
+			]).expand(output);
+
+			$("#content").html(html);
+			yield (null);
+		};
+
+
+		$(document).ready(function(){
+			GUI.setup(
+				createChart,
+				[
+				],
+				[
+				],
+				"bugs",
+				false		//SHOW DEFAULT FILTERS?
+			);
+		});
+
+	});
+
+</script>
+
+
+</BODY>
+</HTML>
+
