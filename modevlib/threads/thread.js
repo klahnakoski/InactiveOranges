@@ -332,6 +332,7 @@ build = function(){
 		if (exitEarly) return;
 		this.children=[];
 
+		if (DEBUG) Log.note("Thread " + this.name + " end with " +retval);
 		this.threadResponse = retval;				//REMEMBER FOR THREAD THAT JOINS WITH THIS
 		this.keepRunning = false;
 		this.parentThread.children.remove(this);
@@ -482,6 +483,8 @@ build = function(){
 								var temp = resumeCurrentThread;
 								resumeCurrentThread = null;
 								temp(retval)
+							}else{
+								if (DEBUG) Log.note(otherThread.name + " already resumed, returning previous returned value");
 							}//endif
 							return retval;
 						};
