@@ -4,6 +4,7 @@
    - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 <HTML>
 <HEAD>
+	<title>Neglected Oranges</title>
 	<script type="text/javascript" src="modevlib/imports/import.js"></script>
 </HEAD>
 <BODY>
@@ -44,6 +45,7 @@ importScript(
 		"js/review.js",
 		'modevlib/main.js'
 	], function(){
+		var MIN_ORANGE_COUNT = 3;
 		var KNOWN_ROBOTS=[
 			"pulsebot@bots.tld",
 			"orangefactor@bots.tld",
@@ -58,6 +60,7 @@ importScript(
 		};
 
 		var __createChart = function*(){
+			var OLD = Date.today().subtract(Duration.WEEK).getMilli();
 
 			var oranges=null;
 			// GET THE FREQUENT ORANGES
@@ -70,15 +73,17 @@ importScript(
 						"select":{"name":"OrangeCount", "value":"bug", "aggregate":"count"},
 						"groupby": ["bug"],
 						"where": {"gt": {"timestamp": {"date": "today-week"}}},
-						"limit": 100,
+						"limit": 1000,
 						"format": "list"
 					}
 				});
 
-				oranges = Map.zip(response.data.map(function(b, i){
+				oranges = Map.zip(response.data.mapExists(function(b, i){
 					b.ordering = i;
 					b.comments=[];
-					return [b.bug, b]
+					if (b.OrangeCount >= MIN_ORANGE_COUNT) {
+						return [b.bug, b]
+					}//endif
 				}));
 
 			}finally{
@@ -93,7 +98,12 @@ importScript(
 				try{
 					response = yield ESQuery.run({
 						"from": "public_bugs",
-						"select": ["bug_id", {"name":"Description", "value":"short_desc"}, "modified_ts"],
+						"select": [
+							"bug_id",
+							{"name":"Description", "value":"short_desc"},
+							"modified_ts",
+							"created_ts"
+						],
 						"esfilter": {"and": [
 							{"range":{"expires_on":{"gt":Date.now().getMilli()}}},
 							{"terms": {"bug_id": Map.keys(oranges)}}
@@ -113,15 +123,18 @@ importScript(
 				try{
 					response = yield ESQuery.run({
 						"from": "public_comments",
-						"select": ["bug_id","modified_by", "modified_ts"],
+						"select": {"value":"modified_ts", "aggregate":"max"},
+						"edges":[
+							{"value":"bug_id", "domain":{"type":"set", "partitions":Map.keys(oranges)}}
+					    ],
 						"esfilter": {"and": [
 							{"not": {"terms": {"modified_by": KNOWN_ROBOTS}}},
-							{"range":{"modified_ts":{"gt":Date.newInstance("today-week").getMilli()}}},
 							{"terms": {"bug_id": Map.keys(oranges)}}
 						]}
 					});
-					response.list.forall(function(c){
-						oranges[c.bug_id].comments.append(c);
+					var data = qb.Cube2List(response);
+					data.forall(function(c){
+						oranges[c.bug_id].last_comment = c.modified_ts;
 					});
 
 				}finally{
@@ -132,8 +145,15 @@ importScript(
 			yield Thread.join(getBugs);
 			yield Thread.join(getComments);
 
+			var NOW = Date.now().getMilli();
 			var output = Map.map(oranges, function(k,v){
-				if (v.comments.length==0){
+				if (v.last_comment < OLD){
+					v.bugAge = Duration.newInstance(NOW - v.created_ts).round(Duration.DAY) + " days";
+					if (v.last_comment) {
+						v.commentAge = Duration.newInstance(NOW - v.last_comment).round(Duration.DAY) + " days";
+					}else{
+						v.commentAge = "never";
+					}//endif
 					return v;
 				}//endif
 			});
@@ -142,17 +162,21 @@ importScript(
 			output=qb.sort(output, {"value":"OrangeCount", "sort":-1});
 			var html = new Template([
 				'<table class="table"><thead><tr>',
-				'<td>Bug ID</td>',
+				'<td style="text-align:center">Bug ID</td>',
+				'<td style="text-align:center">Bug Age</td>',
+				'<td style="text-align:center">Last Comment</td>',
 				'<td>Description</td>',
-				'<td>Orange Count</td>',
+				'<td style="text-align:center">Orange Count</td>',
 				'</tr></thead><tbody>',
 				{
 					"from":".",
 					"template":[
 						'<tr class="hoverable" onclick="Bugzilla.showBugs([{{bug}}])">',
-						'<td>{{bug}}</td>',
-						'<td style="width:600px;text-wrap: normal;">{{Description}}</td>',
-						'<td style="text-align: right">{{OrangeCount}}</td>',
+						'<td><div>{{bug}}</div></td>',
+						'<td><div style="width:80px;text-align:center">{{bugAge}}</div></td>',
+						'<td><div style="width:80px;text-align:center">{{commentAge}}</div></td>',
+						'<td><div style="width:600px;text-wrap: normal;">{{Description}}</div></td>',
+						'<td><div style="text-align: right">{{OrangeCount}}</div></td>',
 						'</tr>'
 					]
 				},
