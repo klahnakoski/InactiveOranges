@@ -19,7 +19,9 @@
 
 	<hr>
 	<div id="description">
-		Cross-reference Bugzilla and Orange Factor to produce a list of most active intermittent failures with no comments for the past week.
+		Cross-reference Bugzilla and Orange Factor to produce a list of most
+		active intermittent failures with no comments for the past week,
+		not include comments from today.
 	</div>
 	<hr>
 	<div id="testMessage"></div>
@@ -129,7 +131,8 @@ importScript(
 					    ],
 						"esfilter": {"and": [
 							{"not": {"terms": {"modified_by": KNOWN_ROBOTS}}},
-							{"terms": {"bug_id": Map.keys(oranges)}}
+							{"terms": {"bug_id": Map.keys(oranges)}},
+							{"range": {"modified_ts": {"lt": NOW}}}
 						]}
 					});
 					var data = qb.Cube2List(response);
