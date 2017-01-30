@@ -47,7 +47,7 @@ importScript(
 		"js/review.js",
 		'modevlib/main.js'
 	], function(){
-		var MIN_ORANGE_COUNT = 3;
+		var MIN_ORANGE_COUNT = 20;
 		var KNOWN_ROBOTS=[
 			"pulsebot@bots.tld",
 			"orangefactor@bots.tld",
@@ -74,8 +74,11 @@ importScript(
 						"from": "orange_factor",
 						"select":{"name":"OrangeCount", "value":"bug", "aggregate":"count"},
 						"groupby": ["bug"],
-						"where": {"gt": {"timestamp": {"date": "today-week"}}},
-						"limit": 1000,
+						"where": {"and":[
+							{"gt": {"timestamp": {"date": "today-week"}}},
+							{"in": {"tree": ["mozilla-central","mozilla-inbound","autoland"]}},
+						]},
+						"limit": 200,
 						"format": "list"
 					}
 				});
@@ -131,8 +134,7 @@ importScript(
 					    ],
 						"esfilter": {"and": [
 							{"not": {"terms": {"modified_by": KNOWN_ROBOTS}}},
-							{"terms": {"bug_id": Map.keys(oranges)}},
-							{"range": {"modified_ts": {"lt": NOW}}}
+							{"terms": {"bug_id": Map.keys(oranges)}}
 						]}
 					});
 					var data = qb.Cube2List(response);
