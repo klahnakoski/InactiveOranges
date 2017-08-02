@@ -152,7 +152,8 @@ importScript(
 
 			var NOW = Date.now().getMilli();
 			var output = Map.map(oranges, function(k,v){
-			    if (v.last_comment == null){
+			    if (!v.created_ts){
+			        // SOME BUGS ARE NOT IN THE PUBLIC CLUSTER
 					v.bugAge = "private";
 					v.commentAge = "private";
 					return v;
