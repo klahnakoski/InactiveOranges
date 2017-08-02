@@ -152,7 +152,11 @@ importScript(
 
 			var NOW = Date.now().getMilli();
 			var output = Map.map(oranges, function(k,v){
-				if (v.last_comment < OLD){
+			    if (v.last_comment == null){
+					v.bugAge = "private";
+					v.commentAge = "private";
+					return v;
+				}else if (v.last_comment < OLD){
 					v.bugAge = Duration.newInstance(NOW - v.created_ts).round(Duration.DAY) + " days";
 					if (v.last_comment) {
 						v.commentAge = Duration.newInstance(NOW - v.last_comment).round(Duration.DAY) + " days";
