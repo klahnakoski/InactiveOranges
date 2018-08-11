@@ -71,13 +71,17 @@ importScript(
 				var response = yield Rest.post({
 					"url": "https://activedata.allizom.org/query",
 					"json": {
-						"from": "orange_factor",
+						"from": "treeherder",
 						"select":{"name":"OrangeCount", "value":"bug", "aggregate":"count"},
-						"groupby": ["bug"],
-						"where": {"and":[
-							{"gt": {"timestamp": {"date": "today-week"}}},
-							{"in": {"tree": ["mozilla-central","mozilla-inbound","autoland"]}},
-						]},
+						"groupby": [{"name": "bug", "value": "bugs.bug_id"}],
+						"where": {
+							"and": [
+								{"gt": {"repo.push.date": {"date": "today-week"}}},
+								{"in": {"repo.branch.name": ["mozilla-central", "mozilla-inbound", "autoland"]}},
+								{"ne": {"failure.classify": "not classified"}},
+								{"exists": "bugs.bug_id"},
+							],
+						},
 						"limit": 200,
 						"format": "list"
 					}
