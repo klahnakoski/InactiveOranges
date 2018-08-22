@@ -72,7 +72,7 @@ importScript(
 					"url": "https://activedata.allizom.org/query",
 					"json": {
 						"from": "treeherder",
-						"select":{"name":"OrangeCount", "value":"bug", "aggregate":"count"},
+						"select":{"name":"OrangeCount", "value":"bugs.bug_id", "aggregate":"count"},
 						"groupby": [{"name": "bug", "value": "bugs.bug_id"}],
 						"where": {
 							"and": [
