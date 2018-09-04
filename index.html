@@ -47,28 +47,28 @@ importScript(
 		"js/review.js",
 		'modevlib/main.js'
 	], function(){
-		var MIN_ORANGE_COUNT = 20;
-		var KNOWN_ROBOTS=[
+		let MIN_ORANGE_COUNT = 20;
+		let KNOWN_ROBOTS=[
 			"pulsebot@bots.tld",
 			"orangefactor@bots.tld",
 			"intermittent-bug-filer@mozilla.bugs"
 		];
 
-		var thread;
-		var createChart = function(){
+		let thread;
+		let createChart = function(){
 			if (thread !== undefined)
 				thread.kill();
 			thread = Thread.run(__createChart());
 		};
 
-		var __createChart = function*(){
-			var OLD = Date.today().subtract(Duration.WEEK).getMilli();
+		let __createChart = function*(){
+			let OLD = Date.today().subtract(Duration.WEEK).getMilli();
 
-			var oranges=null;
+			let oranges=null;
 			// GET THE FREQUENT ORANGES
-			var a = Log.action("get oranges", true);
+			let a = Log.action("get oranges", true);
 			try {
-				var response = yield Rest.post({
+				let response = yield Rest.post({
 					"url": "https://activedata.allizom.org/query",
 					"json": {
 						"from": "treeherder",
@@ -99,13 +99,14 @@ importScript(
 				Log.actionDone(a)
 			}//try
 
+			let orangeBugs = Map.keys(oranges).map(convert.String2Integer);
 
-			var bugs=null;
-			var comments=null;
-			var getBugs = Thread.run(function*(){
-				var ba = Log.action("get bugs", true);
+			let bugs=null;
+			let comments=null;
+			let getBugs = Thread.run(function*(){
+				let ba = Log.action("get bugs", true);
 				try{
-					response = yield ESQuery.run({
+					response = yield ActiveDataQuery.run({
 						"from": "public_bugs",
 						"select": [
 							"bug_id",
@@ -113,13 +114,15 @@ importScript(
 							"modified_ts",
 							"created_ts"
 						],
-						"esfilter": {"and": [
+						"where": {"and": [
 							{"range":{"expires_on":{"gt":Date.now().getMilli()}}},
-							{"terms": {"bug_id": Map.keys(oranges)}}
-						]}
+							{"terms": {"bug_id": orangeBugs}}
+						]},
+						"limit": 200,
+						"format": "list"
 					});
 
-					response.list.forall(function(b){
+					response.data.forall(function(b){
 						Map.setDefault(oranges[b.bug_id], b);
 					});
 				}finally{
@@ -127,21 +130,23 @@ importScript(
 				}//try
 			});
 
-			var getComments= Thread.run(function*(){
-				var ca = Log.action("get comments", true);
+			let getComments= Thread.run(function*(){
+				let ca = Log.action("get comments", true);
 				try{
-					response = yield ESQuery.run({
+					response = yield ActiveDataQuery.run({
 						"from": "public_comments",
 						"select": {"value":"modified_ts", "aggregate":"max"},
 						"edges":[
-							{"value":"bug_id", "domain":{"type":"set", "partitions":Map.keys(oranges)}}
+							{"value": "bug_id", "domain": {"type": "set", "partitions": orangeBugs}, "allowNulls": false},
 					    ],
-						"esfilter": {"and": [
+						"where": {"and": [
 							{"not": {"terms": {"modified_by": KNOWN_ROBOTS}}},
-							{"terms": {"bug_id": Map.keys(oranges)}}
-						]}
+							{"terms": {"bug_id": orangeBugs}}
+						]},
+						"limit": 200,
+						"format": "list"
 					});
-					var data = qb.Cube2List(response);
+					let data = response.data;
 					data.forall(function(c){
 						oranges[c.bug_id].last_comment = c.modified_ts;
 					});
@@ -154,8 +159,8 @@ importScript(
 			yield Thread.join(getBugs);
 			yield Thread.join(getComments);
 
-			var NOW = Date.now().getMilli();
-			var output = Map.map(oranges, function(k,v){
+			let NOW = Date.now().getMilli();
+			let output = Map.map(oranges, function(k,v){
 			    if (!v.created_ts){
 			        // SOME BUGS ARE NOT IN THE PUBLIC CLUSTER
 					v.bugAge = "private";
@@ -174,7 +179,7 @@ importScript(
 
 
 			output=qb.sort(output, {"value":"OrangeCount", "sort":-1});
-			var html = new Template([
+			let html = new Template([
 				'<table class="table"><thead><tr>',
 				'<td style="text-align:center">Bug ID</td>',
 				'<td style="text-align:center">Bug Age</td>',
@@ -210,7 +215,8 @@ importScript(
 				[
 				],
 				"bugs",
-				false		//SHOW DEFAULT FILTERS?
+				false,		//SHOW DEFAULT FILTERS?
+				false		//PERFORM CONSISTENCY CHECKS
 			);
 		});
 
