@@ -99,7 +99,7 @@ importScript("tools.js");
 				var canonical = Map.values(cube)[0];
 				//CONVERT cube TO ARRAY OF OBJECTS
 				//EDGE PARTS ARE STILL IN OBJECT FORM
-				data = new Matrix(canonical).map(function(_, c){
+				data = new Matrix(canonical).mapExists(function(_, c){
 					var output = {};
 					Map.forall(cube, function(columnName, m){
 						output[columnName] = m.get(c);
@@ -222,7 +222,7 @@ importScript("tools.js");
 			x_accessor: x_accessor,
 			y_accessor: y_accessor,
 			color_accessor: "_colorIndex",
-			color_domain: styles.map(function(v, i){
+			color_domain: styles.mapExists(function(v, i){
 				return i;
 			}),
 			color_range: styles.select("color"),

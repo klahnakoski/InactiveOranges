@@ -24,7 +24,6 @@ importScript("charts/aColor.js");
 			"public_comments" : {"style" : {"color" : "black", "background-color" : yellow}, "host" : "https://activedata-public.devsvcprod.mozaws.net", "path":"/query", "host_type":"ActiveData"},
 			"private_bugs" : {"style" : {"color" : "black", "background-color" : yellow}, "host" : "https://activedata-private.devsvcprod.mozaws.net", "path":"/query", "host_type":"ActiveData"},
 			"private_comments" : {"style" : {"color" : "black", "background-color" : yellow}, "host" : "https://activedata-private.devsvcprod.mozaws.net", "path":"/query", "host_type":"ActiveData"},
-
 			// ACTIVE DATA TABLES
 			"branches": {"style" : {"background-color" : blue}, "host" : "https://activedata.allizom.org", "table":"branches", "host_type":"ActiveData"},
 			"jobs": {"style" : {"background-color" : blue}, "host" : "https://activedata.allizom.org", "table":"jobs", "host_type":"ActiveData"},

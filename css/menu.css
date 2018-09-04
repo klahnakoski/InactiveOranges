@@ -456,14 +456,13 @@ table.grid td.vSeperatorA {
 
 
 .parameters {
-    width: 320px;
     margin-left: auto;
     margin-right: auto;
 }
 
 span.parameter_name {
     float: left;
-    width: 150px;
+    width: 120px;
     text-align: right;
     margin-right: 10px;
 }

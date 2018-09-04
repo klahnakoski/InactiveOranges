@@ -68,7 +68,7 @@
 	expressions.sub = function(expr){
 		var output;
 		if (isArray(expr.sub)) {
-			var exprs = expr.sub.map(qb2function);
+			var exprs = expr.sub.mapExists(qb2function);
 			output = function(value){
 				return exprs[0](value) - exprs[1](value);
 			};
@@ -87,7 +87,7 @@
 	expressions.eq = function(expr){
 		var output;
 		if (isArray(expr.eq)) {
-			var exprs = expr.eq.map(qb2function);
+			var exprs = expr.eq.mapExists(qb2function);
 			output = function(value){
 				return exprs[0](value) == exprs[1](value);
 			};
@@ -102,6 +102,15 @@
 		return output;
 	};
 
+	expressions.term = function(expr){
+		var output;
+		let vars = Map.keys(expr.term)[0];
+		let vals = Map.values(expr.term)[0];
+		output = function(value){
+			return vals == value[vars];
+		};
+		return output;
+	};
 
 	expressions.literal = function(expr){
 		var output;
@@ -167,11 +176,21 @@
 		return output;
 	};
 
+	expressions.not = function(expr){
+		var output;
+		var test = qb2function(expr.not);
+
+		output = function(value){
+			return !test(value);
+		};
+		if (DEBUG) output.expression = convert.value2json(expr);
+		return output;
+	};
 
 	expressions.gt = function(expr){
 		var output;
 		if (isArray(expr.gt)) {
-			var exprs = expr.gt.map(qb2function);
+			var exprs = expr.gt.mapExists(qb2function);
 			output = function(value){
 				return exprs[0](value) > exprs[1](value);
 			};
@@ -187,10 +206,21 @@
 		return output;
 	};
 
+	expressions.terms = function(expr){
+		var output;
+		let vars = Map.keys(expr.terms)[0];
+		let vals = Map.values(expr.terms)[0];
+		if (!isArray(vals))	Log.error("Expecting terms to have an array");
+		output = function(value){
+			return vals.contains(value[vars]);
+		};
+		return output;
+	};
+
 	expressions.add = function(expr){
 		var output;
 		if (isArray(expr.add)) {
-			var exprs = expr.add.map(qb2function);
+			var exprs = expr.add.mapExists(qb2function);
 			output = function(value){
 				return exprs[0](value) + exprs[1](value);
 			};

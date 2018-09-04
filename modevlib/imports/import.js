@@ -11,7 +11,6 @@
 //THIS FUNCTION CAN ONLY BE RUN ONCE, AFTER WHICH IT WILL REPLACE ITSELF WITH A NULL FUNCTION
 var importScript;
 
-
 (function () {
 	"use strict";
 
@@ -251,8 +250,12 @@ var importScript;
 
 		function onLoadCallback() {
 			var path;
-			if (this.src.startsWith(window.location.origin)) {
-				path = this.src.slice(window.location.origin.length).split("?")[0].split("#")[0];
+			var origin = window.location.origin;
+			if (origin == "null") { // for file:, origin is the string "null"
+				origin = window.location.protocol + "//";
+			}
+			if (this.src.startsWith(origin)) {
+				path = this.src.slice(origin.length).split("?")[0].split("#")[0];
 			}else{
 				path = this.src.split("?")[0].split("#")[0];
 			}//endif
