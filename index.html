@@ -71,15 +71,15 @@ importScript(
 				let response = yield Rest.post({
 					"url": "https://activedata.allizom.org/query",
 					"json": {
-						"from": "treeherder",
+						"from": "treeherder.bugs",
 						"select":{"name":"OrangeCount", "value":".", "aggregate":"count"},
-						"groupby": [{"name": "bug", "value": "bugs.bug_id"}],
+						"groupby": [{"name": "bug", "value": "bug_id"}],
 						"where": {
 							"and": [
 								{"gt": {"repo.push.date": {"date": "today-week"}}},
 								{"in": {"repo.branch.name": ["mozilla-central", "mozilla-inbound", "autoland"]}},
-								{"ne": {"failure.classify": "not classified"}},
-								{"exists": "bugs.bug_id"},
+								{"ne": {"failure.classification": "not classified"}},
+								{"exists": "bug_id"},
 							],
 						},
 						"limit": 200,
